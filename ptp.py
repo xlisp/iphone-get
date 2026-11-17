@@ -106,22 +106,19 @@ class USBFS:
         desc = self.get_config_descriptor()
         eps = []
         i = 0
-        iface_ep = None
+        in_iface0 = False
         while i < len(desc):
             blen = desc[i]
             if blen < 2:
                 break
             btype = desc[i + 1]
             if btype == 0x04:
-                iface_num = desc[i + 2]
-                iface_ep = []
-                if iface_num == 0:
-                    eps.append(iface_ep)
-            elif btype == 0x05:
+                in_iface0 = desc[i + 2] == 0
+            elif btype == 0x05 and in_iface0:
                 addr = desc[i + 2]
                 attrs = desc[i + 3]
                 if (attrs & 0x03) == 0x02:
-                    iface_ep.append(addr)
+                    eps.append(addr)
             i += blen
         return eps
 
